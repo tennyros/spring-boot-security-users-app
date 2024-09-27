@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin page</title>
+    <style>
+        th {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Current users</h1>
+    <div th:if="${#lists.isEmpty(users)}">
+        <p>There are no users!</p>
+    </div>
+    <div th:unless="${#lists.isEmpty(users)}">
+        <table th:border="1" style="width:300px">
+            <thead>
+                <tr>
+                    <th>User id</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Email</th>
+                    <th>Age</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="user : ${users}">
+                    <td th:text="${user.id}"></td>
+                    <td th:text="${user.username}"></td>
+                    <td th:text="${user.email}"></td>
+                    <td th:text="${user.age}"></td>
+                    <td>
+                        <form th:method="get" th:action="@{/edit}">
+                            <input type="hidden" name="id" th:value="${user.id}">
+                            <button type="submit">Edit</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div><br>
+    <form th:method="post" th:action="@{/logout}">
+        <button type="submit">Logout</button>
+    </form>
+</body>
+</html>
