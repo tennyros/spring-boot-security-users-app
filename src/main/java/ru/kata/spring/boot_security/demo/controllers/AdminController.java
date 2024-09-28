@@ -6,24 +6,22 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.dto.UserDto;
 import ru.kata.spring.boot_security.demo.models.User;
-import ru.kata.spring.boot_security.demo.security.AppUserDetails;
 import ru.kata.spring.boot_security.demo.services.UserService;
 import ru.kata.spring.boot_security.demo.util.UserValidator;
 
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping(value = "/admin")
 public class AdminController {
 
     private final UserService userService;
     private final UserValidator userValidator;
+
+    private static final String UPDATE_USER_URL = "/admin/update_user";
 
     @Autowired
     public AdminController(UserService userService, UserValidator userValidator) {
@@ -31,11 +29,11 @@ public class AdminController {
         this.userValidator = userValidator;
     }
 
-    @GetMapping("/admin_page")
+    @GetMapping(value = "/admin_page")
     public String adminFullInfo(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        AppUserDetails appUserDetails = (AppUserDetails) authentication.getPrincipal();
-        if (appUserDetails.getAuthorities().stream()
+        User user = (User) authentication.getPrincipal();
+        if (user.getAuthorities().stream()
                 .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"))) {
             model.addAttribute("users", userService.getAllUsers());
             return "admin/admin_page";
@@ -43,12 +41,12 @@ public class AdminController {
         return "auth/login";
     }
 
-    @GetMapping("/edit")
+    @GetMapping(value = "/edit")
     public String editUser(@ModelAttribute("userDto") UserDto userDto) {
-        return "admin/update_user";
+        return UPDATE_USER_URL;
     }
 
-    @PostMapping("/update")
+    @PostMapping(value = "/update")
     public String updateUserExecution(@Valid @ModelAttribute("userDto") UserDto userDto,
                                       BindingResult result) {
         userValidator.validate(userDto, result);
@@ -57,14 +55,23 @@ public class AdminController {
                     "Passwords do not match!");
         }
         if (result.hasErrors()) {
-            return "admin/update_user";
+            return UPDATE_USER_URL;
         }
-        User user = new User();
-        user.setUsername(userDto.getUsername());
-        user.setPassword(userDto.getPassword());
-        user.setEmail(userDto.getEmail());
-        user.setAge(userDto.getAge());
-        userService.updateUser(user);
+        userService.updateUser(userService.convertToUser(userDto));
+        return "redirect:/admin/admin_page";
+    }
+
+    @PostMapping(value = "/delete")
+    public String deleteUser(@ModelAttribute("userDto") UserDto userDto, Model model) {
+        Long userId = userDto.getId();
+        User user = userService.getUserById(userId);
+        boolean isAdmin = user.getRoles().stream()
+                        .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
+        if (isAdmin) {
+            model.addAttribute("errorMessage", "You can not delete user with admin role!");
+            return UPDATE_USER_URL;
+        }
+        userService.deleteUser(userId);
         return "redirect:/admin/admin_page";
     }
 }

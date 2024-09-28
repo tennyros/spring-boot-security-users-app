@@ -6,17 +6,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import ru.kata.spring.boot_security.demo.security.AppUserDetails;
+import ru.kata.spring.boot_security.demo.models.User;
 
 @Controller
-@RequestMapping("/user")
+@RequestMapping(value = "/user")
 public class UserController {
 
-    @GetMapping("/user_page")
+    @GetMapping(value = "/user_page")
     public String showUserInfo(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        AppUserDetails appUserDetails = (AppUserDetails) authentication.getPrincipal();
-        model.addAttribute("user", appUserDetails.getUser());
+        User user = (User) authentication.getPrincipal();
+        model.addAttribute("user", user);
         return "/user/user_page";
     }
 }

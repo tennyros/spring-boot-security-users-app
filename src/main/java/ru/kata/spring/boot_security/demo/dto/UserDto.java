@@ -4,14 +4,18 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.kata.spring.boot_security.demo.models.Role;
 
 import javax.validation.constraints.*;
+import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 public class UserDto {
+
+    private Long id;
 
     @NotBlank(message = "Username must be defined!")
     @Size(min = 3, max = 18, message = "Username must be from 3 to 18 symbols long!")
@@ -32,4 +36,6 @@ public class UserDto {
     @Min(value = 14, message = "Age must not be less than 14!")
     @Max(value = 125, message = "Age must not be more than 125!")
     private Integer age;
+
+    private Set<Role> roles;
 }

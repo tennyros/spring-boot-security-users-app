@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org" lang="en"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>User page</title>
 </head>
@@ -8,7 +10,7 @@
     <table th:border="1" style="width:300px">
         <thead>
             <tr>
-                <th>Пользователь</th>
+                <th>Username</th>
                 <th>Email</th>
                 <th>Age</th>
             </tr>
@@ -18,13 +20,15 @@
                 <td th:text="${user.username}"></td>
                 <td th:text="${user.email}"></td>
                 <td th:text="${user.age}"></td>
-                <td>
-                    <form th:method="post" th:action="@{/logout}">
-                        <button type="submit">Logout</button>
-                    </form>
-                </td>
             </tr>
         </tbody>
     </table>
+    <br>
+    <form th:method="post" th:action="@{/logout}" style="display:inline;">
+        <button type="submit">Logout</button>
+    </form>
+    <form sec:authorize="hasRole('ADMIN')" th:method="get" th:action="@{/admin/admin_page}" style="display:inline;">
+        <button type="submit">Return to users list</button>
+    </form>
 </body>
 </html>

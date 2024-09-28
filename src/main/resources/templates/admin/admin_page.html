@@ -18,31 +18,39 @@
         <table th:border="1" style="width:300px">
             <thead>
                 <tr>
-                    <th>User id</th>
+                    <th>Id</th>
                     <th>Username</th>
                     <th>Password</th>
                     <th>Email</th>
                     <th>Age</th>
+                    <th>Roles</th>
                 </tr>
             </thead>
             <tbody>
                 <tr th:each="user : ${users}">
                     <td th:text="${user.id}"></td>
                     <td th:text="${user.username}"></td>
+                    <td th:text="${user.password}"></td>
                     <td th:text="${user.email}"></td>
                     <td th:text="${user.age}"></td>
+                    <td th:text="${#strings.arrayJoin(user.roles.toArray(), ', ')}"></td>
                     <td>
-                        <form th:method="get" th:action="@{/edit}">
+                        <form th:method="get" th:action="@{/admin/edit}">
                             <input type="hidden" name="id" th:value="${user.id}">
-                            <button type="submit">Edit</button>
+                            <button type="submit" style="width:50px">Edit</button>
                         </form>
                     </td>
                 </tr>
             </tbody>
         </table>
     </div><br>
-    <form th:method="post" th:action="@{/logout}">
+
+    <form th:method="post" th:action="@{/logout}" style="display:inline;">
         <button type="submit">Logout</button>
+    </form>
+
+    <form th:method="get" th:action="@{/user/user_page}" style="display:inline;">
+        <button type="submit" >User's view</button>
     </form>
 </body>
 </html>

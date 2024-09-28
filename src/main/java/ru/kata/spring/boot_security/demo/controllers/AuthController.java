@@ -8,36 +8,39 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.kata.spring.boot_security.demo.dto.UserDto;
-import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.services.RegistrationService;
+import ru.kata.spring.boot_security.demo.services.UserService;
 import ru.kata.spring.boot_security.demo.util.UserValidator;
 
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping("/auth")
+@RequestMapping(value = "/auth")
 public class AuthController {
 
     private final RegistrationService registrationService;
     private final UserValidator userValidator;
+    private final UserService userService;
 
     @Autowired
-    public AuthController(RegistrationService registrationService, UserValidator userValidator) {
+    public AuthController(RegistrationService registrationService, UserValidator userValidator,
+                          UserService userService) {
         this.registrationService = registrationService;
         this.userValidator = userValidator;
+        this.userService = userService;
     }
 
-    @GetMapping("/login")
+    @GetMapping(value = "/login")
     public String login() {
         return "auth/login";
     }
 
-    @GetMapping("/registration")
+    @GetMapping(value = "/registration")
     public String registration(@ModelAttribute("userDto") UserDto userDto) {
         return "auth/registration";
     }
 
-    @PostMapping("/registration")
+    @PostMapping(value = "/registration")
     public String registrationExecution(@Valid @ModelAttribute("userDto") UserDto userDto,
                                         BindingResult result) {
         userValidator.validate(userDto, result);
@@ -48,12 +51,7 @@ public class AuthController {
         if (result.hasErrors()) {
             return "auth/registration";
         }
-        User user = new User();
-        user.setUsername(userDto.getUsername());
-        user.setPassword(userDto.getPassword());
-        user.setEmail(userDto.getEmail());
-        user.setAge(userDto.getAge());
-        registrationService.register(user);
+        registrationService.register(userService.convertToUser(userDto));
         return "redirect:/auth/login";
     }
 }
