@@ -38,4 +38,10 @@ public class UserDto {
     private Integer age;
 
     private Set<Role> roles;
+
+    private boolean isAdmin;
+
+    public boolean getIsAdmin() {
+        return isAdmin;
+    }
 }

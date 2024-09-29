@@ -17,4 +17,5 @@ public interface UserService {
     Optional<User> getUserByEmail(String email);
 
     User convertToUser(UserDto userDto);
+    UserDto convertToUserDto(User user);
 }

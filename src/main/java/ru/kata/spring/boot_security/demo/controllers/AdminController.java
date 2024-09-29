@@ -8,7 +8,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.dto.UserDto;
+import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.models.User;
+import ru.kata.spring.boot_security.demo.services.RoleService;
 import ru.kata.spring.boot_security.demo.services.UserService;
 import ru.kata.spring.boot_security.demo.util.UserValidator;
 
@@ -19,13 +21,15 @@ import javax.validation.Valid;
 public class AdminController {
 
     private final UserService userService;
+    private final RoleService roleService;
     private final UserValidator userValidator;
 
     private static final String UPDATE_USER_URL = "/admin/update_user";
 
     @Autowired
-    public AdminController(UserService userService, UserValidator userValidator) {
+    public AdminController(UserService userService, UserValidator userValidator, RoleService roleService) {
         this.userService = userService;
+        this.roleService = roleService;
         this.userValidator = userValidator;
     }
 
@@ -42,22 +46,39 @@ public class AdminController {
     }
 
     @GetMapping(value = "/edit")
-    public String editUser(@ModelAttribute("userDto") UserDto userDto) {
+    public String editUser(@RequestParam("id") Long id, Model model) {
+        User user = userService.getUserById(id);
+        UserDto userDto = userService.convertToUserDto(user);
+
+        userDto.setAdmin(user.getRoles().stream()
+                .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN")));
+
+        model.addAttribute("userDto", userDto);
         return UPDATE_USER_URL;
     }
 
     @PostMapping(value = "/update")
     public String updateUserExecution(@Valid @ModelAttribute("userDto") UserDto userDto,
-                                      BindingResult result) {
+                                      BindingResult result, Model model) {
         userValidator.validate(userDto, result);
         if (!userDto.getPassword().equals(userDto.getPasswordConfirm())) {
             result.rejectValue("passwordConfirm", "error.userDto",
                     "Passwords do not match!");
         }
         if (result.hasErrors()) {
+
             return UPDATE_USER_URL;
         }
-        userService.updateUser(userService.convertToUser(userDto));
+
+        User user = userService.convertToUser(userDto);
+        Role adminRole = roleService.getRoleByName("ROLE_ADMIN");
+        if (userDto.getIsAdmin()) {
+            user.getRoles().add(adminRole);
+        } else {
+            user.getRoles().remove(adminRole);
+        }
+
+        userService.updateUser(user);
         return "redirect:/admin/admin_page";
     }
 

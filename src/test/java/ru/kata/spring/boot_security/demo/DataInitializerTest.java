@@ -4,14 +4,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.kata.spring.boot_security.demo.models.DataInitializer;
 import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
 import ru.kata.spring.boot_security.demo.repositories.UserRepository;
 
 import static org.mockito.Mockito.when;
 
-public class DataInitializerTest {
+class DataInitializerTest {
 
     @Mock
     private UserRepository userRepository;
@@ -31,6 +30,5 @@ public class DataInitializerTest {
     void testRun_createsRolesAndAdminOnce() throws Exception {
         when(roleRepository.findByRoleName("ADMIN")).thenReturn(null);
         when(roleRepository.findByRoleName("USER")).thenReturn(null);
-
     }
 }
