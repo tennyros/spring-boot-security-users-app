@@ -36,6 +36,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long id) {
+        if (id == 1) {
+            throw new UnsupportedOperationException("You can not delete super administrator!");
+        }
         userRepository.deleteById(id);
     }
 

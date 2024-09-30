@@ -1,11 +1,9 @@
 package ru.kata.spring.boot_security.demo.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import ru.kata.spring.boot_security.demo.models.Role;
 
+import javax.persistence.Transient;
 import javax.validation.constraints.*;
 import java.util.Set;
 
@@ -13,6 +11,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Getter
 @Setter
+@ToString
 public class UserDto {
 
     private Long id;
@@ -25,6 +24,7 @@ public class UserDto {
     @Size(min = 6, max = 18, message = "Password must be from 6 to 18 symbols long!")
     private String password;
 
+    @Transient
     @NotBlank(message = "Please, confirm your password!")
     private String passwordConfirm;
 
@@ -39,9 +39,9 @@ public class UserDto {
 
     private Set<Role> roles;
 
-    private boolean isAdmin;
+    private boolean admin;
 
     public boolean getIsAdmin() {
-        return isAdmin;
+        return admin;
     }
 }

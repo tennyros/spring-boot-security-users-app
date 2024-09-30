@@ -44,8 +44,7 @@ public class User implements Serializable, UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
-//    @Transient
-    private boolean isAdmin;
+    private boolean admin;
 
     public User(String username, String password, String email, Integer age) {
         this.username = username;
@@ -55,7 +54,7 @@ public class User implements Serializable, UserDetails {
     }
 
     public boolean getIsAdmin() {
-        return isAdmin;
+        return admin;
     }
 
     @Override

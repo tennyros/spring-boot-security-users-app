@@ -44,10 +44,6 @@ public class AuthController {
     public String registrationExecution(@Valid @ModelAttribute("userDto") UserDto userDto,
                                         BindingResult result) {
         userValidator.validate(userDto, result);
-        if (!userDto.getPassword().equals(userDto.getPasswordConfirm())) {
-            result.rejectValue("passwordConfirm", "error.userDto",
-                    "Passwords do not match!");
-        }
         if (result.hasErrors()) {
             return "auth/registration";
         }

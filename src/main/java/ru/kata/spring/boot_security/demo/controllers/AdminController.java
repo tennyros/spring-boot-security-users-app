@@ -25,6 +25,8 @@ public class AdminController {
     private final UserValidator userValidator;
 
     private static final String UPDATE_USER_URL = "/admin/update_user";
+    private static final String ROLE_ADMIN = "ROLE_ADMIN";
+    private static final String ERROR = "errorMessage";
 
     @Autowired
     public AdminController(UserService userService, UserValidator userValidator, RoleService roleService) {
@@ -38,7 +40,7 @@ public class AdminController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         if (user.getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"))) {
+                .anyMatch(authority -> authority.getAuthority().equals(ROLE_ADMIN))) {
             model.addAttribute("users", userService.getAllUsers());
             return "admin/admin_page";
         }
@@ -51,7 +53,7 @@ public class AdminController {
         UserDto userDto = userService.convertToUserDto(user);
 
         userDto.setAdmin(user.getRoles().stream()
-                .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN")));
+                .anyMatch(role -> role.getAuthority().equals(ROLE_ADMIN)));
 
         model.addAttribute("userDto", userDto);
         return UPDATE_USER_URL;
@@ -61,23 +63,21 @@ public class AdminController {
     public String updateUserExecution(@Valid @ModelAttribute("userDto") UserDto userDto,
                                       BindingResult result, Model model) {
         userValidator.validate(userDto, result);
-        if (!userDto.getPassword().equals(userDto.getPasswordConfirm())) {
-            result.rejectValue("passwordConfirm", "error.userDto",
-                    "Passwords do not match!");
-        }
         if (result.hasErrors()) {
-
             return UPDATE_USER_URL;
         }
-
+        User existingUser = userService.getUserById(userDto.getId());
+        if (userDto.getRoles() == null || userDto.getRoles().isEmpty()) {
+            userDto.setRoles(existingUser.getRoles());
+        }
         User user = userService.convertToUser(userDto);
-        Role adminRole = roleService.getRoleByName("ROLE_ADMIN");
-        if (userDto.getIsAdmin()) {
+        Role adminRole = roleService.getRoleByName(ROLE_ADMIN);
+
+        if (userDto.getIsAdmin() && !userDto.getRoles().contains(adminRole)) {
             user.getRoles().add(adminRole);
         } else {
             user.getRoles().remove(adminRole);
         }
-
         userService.updateUser(user);
         return "redirect:/admin/admin_page";
     }
@@ -87,12 +87,17 @@ public class AdminController {
         Long userId = userDto.getId();
         User user = userService.getUserById(userId);
         boolean isAdmin = user.getRoles().stream()
-                        .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
+                        .anyMatch(role -> role.getAuthority().equals(ROLE_ADMIN));
         if (isAdmin) {
-            model.addAttribute("errorMessage", "You can not delete user with admin role!");
+            model.addAttribute(ERROR, "You can not delete user with administrator role!");
             return UPDATE_USER_URL;
         }
-        userService.deleteUser(userId);
+        try {
+            userService.deleteUser(userId);
+        } catch (UnsupportedOperationException e) {
+            model.addAttribute(ERROR, e.getMessage());
+            return "error_page";
+        }
         return "redirect:/admin/admin_page";
     }
 }
