@@ -61,7 +61,7 @@ public class AdminController {
 
     @PostMapping(value = "/update")
     public String updateUserExecution(@Valid @ModelAttribute("userDto") UserDto userDto,
-                                      BindingResult result, Model model) {
+                                      BindingResult result) {
         userValidator.validate(userDto, result);
         if (result.hasErrors()) {
             return UPDATE_USER_URL;
@@ -72,11 +72,14 @@ public class AdminController {
         }
         User user = userService.convertToUser(userDto);
         Role adminRole = roleService.getRoleByName(ROLE_ADMIN);
-
-        if (userDto.getIsAdmin() && !userDto.getRoles().contains(adminRole)) {
-            user.getRoles().add(adminRole);
+        if (userDto.getId() == 1) {
+            user.setAdmin(true);
         } else {
-            user.getRoles().remove(adminRole);
+            if (userDto.getIsAdmin() && !userDto.getRoles().contains(adminRole)) {
+                user.getRoles().add(adminRole);
+            } else {
+                user.getRoles().remove(adminRole);
+            }
         }
         userService.updateUser(user);
         return "redirect:/admin/admin_page";

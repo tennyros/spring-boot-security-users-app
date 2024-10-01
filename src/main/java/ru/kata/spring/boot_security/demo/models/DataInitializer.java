@@ -6,8 +6,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
-import ru.kata.spring.boot_security.demo.repositories.UserRepository;
+import ru.kata.spring.boot_security.demo.services.RoleService;
+import ru.kata.spring.boot_security.demo.services.UserService;
 
 import java.util.Set;
 
@@ -26,14 +26,14 @@ public class DataInitializer implements CommandLineRunner {
     @Value("${admin.age}")
     private Integer adminAge;
 
-    private final RoleRepository roleRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
+    private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public DataInitializer(RoleRepository roleRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.roleRepository = roleRepository;
-        this.userRepository = userRepository;
+    public DataInitializer(RoleService roleService, UserService userService, PasswordEncoder passwordEncoder) {
+        this.roleService = roleService;
+        this.userService = userService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -47,22 +47,22 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void createRoles(String roleName) {
-        if (roleRepository.findByRoleName(roleName) == null) {
-            roleRepository.save(new Role(roleName));
+        if (roleService.getRoleByName(roleName) == null) {
+            roleService.addRole(new Role(roleName));
         }
     }
 
     private void createAdmin(String username, String password, String email, Integer age) {
-        if (userRepository.findByUsername(username).isEmpty()) {
+        if (userService.getUserByUsername(username).isEmpty()) {
             User admin = new User();
             admin.setUsername(username);
             admin.setPassword(passwordEncoder.encode(password));
             admin.setEmail(email);
             admin.setAge(age);
-            admin.setRoles(Set.of(roleRepository.findByRoleName("ROLE_ADMIN"),
-                    roleRepository.findByRoleName("ROLE_USER")));
+            admin.setRoles(Set.of(roleService.getRoleByName("ROLE_ADMIN"),
+                    roleService.getRoleByName("ROLE_USER")));
             admin.setAdmin(true);
-            userRepository.save(admin);
+            userService.addUser(admin);
         }
     }
 }

@@ -36,8 +36,8 @@
                 <span th:if="${#fields.hasErrors('passwordConfirm')}" th:errors="*{passwordConfirm}" style="color:red"></span>
             </div>
             <div th:if="${userDto.id != 1}">
-                <label for="isAdmin">Administrator role </label>
-                <input type="checkbox" th:field="*{admin}" id="isAdmin"
+                <label for="admin">Administrator role </label>
+                <input type="checkbox" th:field="*{admin}" id="admin"
                         th:checked="${userDto.isAdmin}">
             </div>
             <br>
