@@ -41,8 +41,8 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        createRoles("ROLE_ADMIN");
         createRoles("ROLE_USER");
+        createRoles("ROLE_ADMIN");
         createAdmin(adminUsername, adminPassword, adminEmail, adminAge);
     }
 

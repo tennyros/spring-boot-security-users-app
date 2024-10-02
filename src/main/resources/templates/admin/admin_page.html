@@ -49,8 +49,11 @@
         <button type="submit">Logout</button>
     </form>
 
-    <form th:method="get" th:action="@{/user/user_page}" style="display:inline;">
+    <form th:method="get" th:action="@{/user}" style="display:inline;">
         <button type="submit" >User's view</button>
+    </form>
+    <form th:method="get" th:action="@{/admin/registration}" style="display:inline;">
+        <button type="submit">Register new user</button>
     </form>
 </body>
 </html>

@@ -6,7 +6,7 @@
 </head>
 <body>
     <h1>Registration page</h1>
-    <form th:method="post" th:action="@{/auth/registration}" th:object="${userDto}" style="display:inline;">
+    <form th:method="post" th:action="@{/admin/registration}" th:object="${userDto}" style="display:inline;">
         <div>
             <label for="username">Enter username: </label>
             <input type="text" th:field="*{username}" id="username" placeholder="username"/>
@@ -32,11 +32,19 @@
             <input type="password" th:field="*{passwordConfirm}" id="passwordConfirm" placeholder="confirm password"/>
             <span th:if="${#fields.hasErrors('passwordConfirm')}" th:errors="*{passwordConfirm}" style="color:red"></span>
         </div>
+        <div>
+            <label for="roles">Select role: </label>
+            <select th:field="*{roles}" id="roles">
+                <option th:each="role : ${roles}"
+                        th:value="${role.id}"
+                        th:text="${role.roleName.substring(5).toLowerCase()}"></option>
+            </select>
+        </div>
         <br>
-        <input type="submit" value="Sign up!">
+        <input type="submit" value="Register a user">
     </form>
-    <form th:method="get" th:action="@{/auth/login}" style="display:inline;">
-        <input type="submit" value="To login page">
+    <form th:method="get" th:action="@{/admin/admin_page}" style="display:inline;">
+        <input type="submit" value="To admin page">
     </form>
 </body>
 </html>

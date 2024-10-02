@@ -35,11 +35,6 @@
                 <input type="password" th:field="*{passwordConfirm}" id="passwordConfirm" placeholder="passwordConfirm">
                 <span th:if="${#fields.hasErrors('passwordConfirm')}" th:errors="*{passwordConfirm}" style="color:red"></span>
             </div>
-            <div th:if="${userDto.id != 1}">
-                <label for="admin">Administrator role </label>
-                <input type="checkbox" th:field="*{admin}" id="admin"
-                        th:checked="${userDto.isAdmin}">
-            </div>
             <br>
             <input type="submit" value="Update"/>
         </form>
