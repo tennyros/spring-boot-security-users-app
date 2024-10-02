@@ -28,10 +28,8 @@ public class AdminController {
     private final UserValidator userValidator;
 
     private static final String UPDATE_USER_URL = "/admin/update_user";
-    private static final String ROLE_ADMIN = "ROLE_ADMIN";
     private static final String REGISTRATION_URL = "/admin/registration";
     private static final String REDIRECT_ADMIN_PAGE = "redirect:/admin/admin_page";
-    private static final String ERROR = "errorMessage";
 
     @Autowired
     public AdminController(UserService userService, RegistrationService registrationService, UserValidator userValidator, RoleService roleService) {
@@ -78,7 +76,7 @@ public class AdminController {
         User user = userService.getUserById(id);
         UserDto userDto = userService.convertToUserDto(user);
         userDto.setAdmin(user.getRoles().stream()
-                .anyMatch(role -> role.getAuthority().equals(ROLE_ADMIN)));
+                .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN")));
         model.addAttribute("userDto", userDto);
         return UPDATE_USER_URL;
     }
@@ -104,13 +102,13 @@ public class AdminController {
         Long userId = userDto.getId();
         User user = userService.getUserById(userId);
         if (user.getId() == 1) {
-            model.addAttribute(ERROR, "You can not delete super administrator!");
+            model.addAttribute("errorMessage", "You can not delete super administrator!");
             return UPDATE_USER_URL;
         }
         try {
             userService.deleteUser(userId);
         } catch (UnsupportedOperationException e) {
-            model.addAttribute(ERROR, e.getMessage());
+            model.addAttribute("errorMessage", e.getMessage());
             return "/error_page";
         }
         return REDIRECT_ADMIN_PAGE;
