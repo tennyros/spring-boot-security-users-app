@@ -10,14 +10,16 @@
     <table th:border="1" style="width:300px">
         <thead>
             <tr>
-                <th>Username</th>
+                <th>First name</th>
+                <th>Last name</th>
                 <th>Email</th>
                 <th>Age</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td th:text="${user.username}"></td>
+                <td th:text="${user.firstName}"></td>
+                <td th:text="${user.lastName}"></td>
                 <td th:text="${user.email}"></td>
                 <td th:text="${user.age}"></td>
             </tr>

@@ -18,7 +18,11 @@ public class UserDto {
 
     @NotBlank(message = "Username must be defined!")
     @Size(min = 3, max = 18, message = "Username must be from 3 to 18 symbols long!")
-    private String username;
+    private String firstName;
+
+    @NotBlank(message = "Username must be defined!")
+    @Size(min = 3, max = 18, message = "Username must be from 3 to 18 symbols long!")
+    private String lastName;
 
     @NotBlank(message = "Password must be defined!")
     @Size(min = 6, max = 18, message = "Password must be from 6 to 18 symbols long!")

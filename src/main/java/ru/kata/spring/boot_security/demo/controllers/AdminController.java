@@ -78,14 +78,16 @@ public class AdminController {
         userDto.setAdmin(user.getRoles().stream()
                 .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN")));
         model.addAttribute("userDto", userDto);
+        model.addAttribute("roles", roleService.getAllRoles());
         return UPDATE_USER_URL;
     }
 
     @PostMapping(value = "/update")
     public String updateUserExecution(@Valid @ModelAttribute("userDto") UserDto userDto,
-                                      BindingResult result) {
+                                      BindingResult result, Model model) {
         userValidator.validate(userDto, result);
         if (result.hasErrors()) {
+            model.addAttribute("roles", roleService.getAllRoles());
             return UPDATE_USER_URL;
         }
         User existingUser = userService.getUserById(userDto.getId());

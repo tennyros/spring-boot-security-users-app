@@ -33,14 +33,14 @@ class UserServiceTest {
 
     @Test
     void testGetUserByUsername_UserExists() {
-        String username = "testUser";
+        String email = "admin@admin.ru";
         User user = new User();
-        user.setUsername(username);
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        user.setEmail(email);
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
 
-        Optional<User> foundUser = userService.getUserByUsername(username);
+        Optional<User> foundUser = userService.getUserByEmail(email);
 
         assertTrue(foundUser.isPresent());
-        assertEquals(username, foundUser.get().getUsername());
+        assertEquals(email, foundUser.get().getUsername());
     }
 }

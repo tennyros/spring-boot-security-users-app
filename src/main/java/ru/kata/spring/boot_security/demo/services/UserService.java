@@ -13,7 +13,6 @@ public interface UserService {
     User getUserById(Long id);
     List<User> getAllUsers();
 
-    Optional<User> getUserByUsername(String username);
     Optional<User> getUserByEmail(String email);
 
     User convertToUser(UserDto userDto);

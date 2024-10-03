@@ -56,12 +56,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<User> getUserByUsername(String username) {
-        return userRepository.findByUsername(username);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Optional<User> getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
@@ -79,7 +73,8 @@ public class UserServiceImpl implements UserService {
             user.setPassword(userDto.getPassword());
         }
         user.setId(userDto.getId());
-        user.setUsername(userDto.getUsername());
+        user.setFirstName(userDto.getFirstName());
+        user.setLastName(userDto.getLastName());
         user.setEmail(userDto.getEmail());
         user.setAge(userDto.getAge());
         user.setAdmin(userDto.getIsAdmin());
@@ -91,7 +86,8 @@ public class UserServiceImpl implements UserService {
     public UserDto convertToUserDto(User user) {
         UserDto userDto = new UserDto();
         userDto.setId(user.getId());
-        userDto.setUsername(user.getUsername());
+        userDto.setFirstName(user.getFirstName());
+        userDto.setLastName(user.getLastName());
         userDto.setPassword(passwordEncoder.encode(user.getPassword()));
         userDto.setEmail(user.getEmail());
         userDto.setAge(user.getAge());

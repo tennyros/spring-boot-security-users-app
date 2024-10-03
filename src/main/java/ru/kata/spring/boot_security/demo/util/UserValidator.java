@@ -29,11 +29,7 @@ public class UserValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         UserDto userDto = (UserDto) target;
-        Optional<User> userByUsername = userService.getUserByUsername(userDto.getUsername());
 
-        if (userByUsername.isPresent() && !userByUsername.get().getId().equals(userDto.getId())) {
-            errors.rejectValue("username", "", "User with such username is already exists!");
-        }
         Optional<User> userByEmail = userService.getUserByEmail(userDto.getEmail());
         if (userByEmail.isPresent() && !userByEmail.get().getId().equals(userDto.getId())) {
             errors.rejectValue("email", "", "User with such email is already exists!");

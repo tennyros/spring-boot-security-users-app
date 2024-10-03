@@ -25,8 +25,11 @@ public class User implements Serializable, UserDetails {
     @Column(name = "user_id", nullable = false, updatable = false, unique = true)
     private Long id;
 
-    @Column(name = "username", nullable = false, unique = true)
-    private String username;
+    @Column(name = "first_name", nullable = false, unique = false)
+    private String firstName;
+
+    @Column(name = "last_name", nullable = false, unique = false)
+    private String lastName;
 
     @Column(name = "password", nullable = false)
     private String password;
@@ -46,8 +49,9 @@ public class User implements Serializable, UserDetails {
 
     private boolean admin;
 
-    public User(String username, String password, String email, Integer age) {
-        this.username = username;
+    public User(String firstName, String lastName, String password, String email, Integer age) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.password = password;
         this.email = email;
         this.age = age;
@@ -69,7 +73,7 @@ public class User implements Serializable, UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
     @Override

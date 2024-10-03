@@ -14,8 +14,11 @@ import java.util.Set;
 @Component
 public class DataInitializer implements CommandLineRunner {
 
-    @Value("${admin.username}")
-    private String adminUsername;
+    @Value("${admin.first_name}")
+    private String adminFirstName;
+
+    @Value("${admin.last_name}")
+    private String adminLastName;
 
     @Value("${admin.password}")
     private String adminPassword;
@@ -43,7 +46,7 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         createRoles("ROLE_USER");
         createRoles("ROLE_ADMIN");
-        createAdmin(adminUsername, adminPassword, adminEmail, adminAge);
+        createAdmin(adminFirstName, adminLastName, adminPassword, adminEmail, adminAge);
     }
 
     private void createRoles(String roleName) {
@@ -52,10 +55,11 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 
-    private void createAdmin(String username, String password, String email, Integer age) {
-        if (userService.getUserByUsername(username).isEmpty()) {
+    private void createAdmin(String firstName, String lastName, String password, String email, Integer age) {
+        if (userService.getUserByEmail(email).isEmpty()) {
             User admin = new User();
-            admin.setUsername(username);
+            admin.setFirstName(firstName);
+            admin.setLastName(lastName);
             admin.setPassword(passwordEncoder.encode(password));
             admin.setEmail(email);
             admin.setAge(age);
