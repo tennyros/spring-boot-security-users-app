@@ -40,7 +40,6 @@ public class DataInitializer implements CommandLineRunner {
         this.passwordEncoder = passwordEncoder;
     }
 
-
     @Override
     @Transactional
     public void run(String... args) throws Exception {

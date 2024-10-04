@@ -1,11 +1,14 @@
 package ru.kata.spring.boot_security.demo.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.dto.UserDto;
+import ru.kata.spring.boot_security.demo.exceptions.UserNotFoundException;
 import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.services.RegistrationService;
@@ -14,6 +17,7 @@ import ru.kata.spring.boot_security.demo.services.UserService;
 import ru.kata.spring.boot_security.demo.util.UserValidator;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,14 +26,17 @@ import java.util.Set;
 @RequestMapping(value = "/admin")
 public class AdminController {
 
+    private static final Logger log = LoggerFactory.getLogger(AdminController.class);
     private final UserService userService;
     private final RoleService roleService;
     private final RegistrationService registrationService;
     private final UserValidator userValidator;
 
+    private static final String ROLES = "roles";
     private static final String UPDATE_USER_URL = "/admin/update_user";
     private static final String REGISTRATION_URL = "/admin/registration";
     private static final String REDIRECT_ADMIN_PAGE = "redirect:/admin/admin_page";
+    private static final String ERROR_MESSAGE = "errorMessage";
 
     @Autowired
     public AdminController(UserService userService, RegistrationService registrationService, UserValidator userValidator, RoleService roleService) {
@@ -47,7 +54,7 @@ public class AdminController {
 
     @GetMapping(value = "/registration")
     public String registration(@ModelAttribute("userDto") UserDto userDto, Model model) {
-        model.addAttribute("roles", roleService.getAllRoles());
+        model.addAttribute(ROLES, roleService.getAllRoles());
         userDto.setRoles(new HashSet<>(Collections.singletonList(roleService.getRoleByName("ROLE_USER"))));
         return REGISTRATION_URL;
     }
@@ -57,15 +64,11 @@ public class AdminController {
                                         BindingResult result, Model model) {
         userValidator.validate(userDto, result);
         if (result.hasErrors()) {
-            model.addAttribute("roles", roleService.getAllRoles());
+            model.addAttribute(ROLES, roleService.getAllRoles());
             return REGISTRATION_URL;
         }
         User user = userService.convertToUser(userDto);
         Set<Role> selectedRoles = userDto.getRoles();
-        if (selectedRoles == null || selectedRoles.isEmpty()) {
-            model.addAttribute("rolesError", "You must select a role to user!");
-            return REGISTRATION_URL;
-        }
         user.setRoles(selectedRoles);
         registrationService.register(user);
         return REDIRECT_ADMIN_PAGE;
@@ -78,7 +81,7 @@ public class AdminController {
         userDto.setAdmin(user.getRoles().stream()
                 .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN")));
         model.addAttribute("userDto", userDto);
-        model.addAttribute("roles", roleService.getAllRoles());
+        model.addAttribute(ROLES, roleService.getAllRoles());
         return UPDATE_USER_URL;
     }
 
@@ -87,7 +90,7 @@ public class AdminController {
                                       BindingResult result, Model model) {
         userValidator.validate(userDto, result);
         if (result.hasErrors()) {
-            model.addAttribute("roles", roleService.getAllRoles());
+            model.addAttribute(ROLES, roleService.getAllRoles());
             return UPDATE_USER_URL;
         }
         User existingUser = userService.getUserById(userDto.getId());
@@ -100,19 +103,37 @@ public class AdminController {
     }
 
     @PostMapping(value = "/delete")
-    public String deleteUser(@ModelAttribute("userDto") UserDto userDto, Model model) {
+    public String deleteUser(@ModelAttribute("userDto") UserDto userDto, Principal principal, Model model) {
+        User currentUser = userService.getUserByEmail(principal.getName())
+                .orElseThrow(() -> {
+                    log.error("Current user is not found for principal {}", principal.getName());
+                    return new UserNotFoundException("Current user now found!");
+                });
+
         Long userId = userDto.getId();
-        User user = userService.getUserById(userId);
-        if (user.getId() == 1) {
-            model.addAttribute("errorMessage", "You can not delete super administrator!");
+        User userToDelete = userService.getUserById(userId);
+
+        if (userToDelete.getId() == 1) {
+            model.addAttribute(ERROR_MESSAGE, "You cannot delete the super administrator!");
+            model.addAttribute("users", userService.getAllUsers());
             return UPDATE_USER_URL;
         }
+
+        if (userToDelete.getRoles().stream().anyMatch(role ->
+                role.getAuthority().equals("ROLE_ADMIN")) && currentUser.getId() != 1) {
+            model.addAttribute(ERROR_MESSAGE, "Only super administrator can delete other administrators!");
+            model.addAttribute(ROLES, roleService.getAllRoles());
+            return UPDATE_USER_URL;
+        }
+
         try {
             userService.deleteUser(userId);
         } catch (UnsupportedOperationException e) {
-            model.addAttribute("errorMessage", e.getMessage());
+            log.error("Error while deleting user with id: {}", userId, e);
+            model.addAttribute(ERROR_MESSAGE, e.getMessage());
             return "/error_page";
         }
+
         return REDIRECT_ADMIN_PAGE;
     }
 }

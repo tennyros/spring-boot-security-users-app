@@ -9,7 +9,7 @@
     <h1>An error occurred</h1>
     <p>Unfortunately, an error occurred while processing your request.</p>
 
-    <p><strong>Error: </strong> <span style="color: red;">${errorMessage}</span></p>
+    <p><strong>Error: </strong> <span th:text="${errorMessage}" style="color: red;"></span></p>
 
     <button onclick="history.back()" class="btn">Return to previous page</button>
   </div>

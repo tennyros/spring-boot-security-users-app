@@ -1,5 +1,7 @@
 package ru.kata.spring.boot_security.demo.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import java.util.Optional;
 @Transactional
 public class UserServiceImpl implements UserService {
 
+    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -37,6 +40,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long id) {
         if (id == 1) {
+            log.error("You are trying to delete a user with id {} (super administrator)!", id);
             throw new UnsupportedOperationException("You can not delete super administrator!");
         }
         userRepository.deleteById(id);
@@ -65,8 +69,10 @@ public class UserServiceImpl implements UserService {
         User user;
         if (userDto.getId() != null) {
             user = userRepository.findById(userDto.getId())
-                    .orElseThrow(() ->
-                            new IllegalArgumentException("User with ID " + userDto.getId() + " not found"));
+                    .orElseThrow(() -> {
+                        log.error("User with ID {} not found!", userDto.getId());
+                        return new IllegalArgumentException("User with ID " + userDto.getId() + " not found!");
+                    });
             user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         } else {
             user = new User();
