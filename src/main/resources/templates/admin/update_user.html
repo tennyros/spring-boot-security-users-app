@@ -1,63 +1,15 @@
     <!DOCTYPE html>
-    <html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <html lang="en">
     <head>
         <meta charset="UTF-8">
         <title>Update user</title>
     </head>
     <body>
-        <div th:if="${errorMessage}" style="color: red;">
-            <p th:text="${errorMessage}"></p>
-        </div>
         <form th:method="post" th:action="@{/admin/update}" th:object="${userDto}" style="display:inline;">
             <input type="hidden" th:field="*{id}"/>
-            <div>
-                <label for="firstName">Enter new first name: </label>
-                <input type="text" th:field="*{firstName}" id="firstName" placeholder="first name">
-                <span th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}" style="color:red"></span>
-            </div>
-            <div>
-                <label for="lastName">Enter new first name: </label>
-                <input type="text" th:field="*{lastName}" id="lastName" placeholder="last name">
-                <span th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}" style="color:red"></span>
-            </div>
-            <div>
-                <label for="email">Enter new email: </label>
-                <input type="email" th:field="*{email}" id="email" placeholder="email">
-                <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="color:red"></span>
-            </div>
-            <div>
-                <label for="age">Enter new age: </label>
-                <input type="number" th:field="*{age}" id="age" placeholder="age">
-                <span th:if="${#fields.hasErrors('age')}" th:errors="*{age}" style="color:red"></span>
-            </div>
-            <div>
-                <label for="password">Enter new password: </label>
-                <input type="password" th:field="*{password}" id="password" placeholder="password">
-                <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color:red"></span>
-            </div>
-            <div>
-                <label for="passwordConfirm">Confirm new password: </label>
-                <input type="password" th:field="*{passwordConfirm}" id="passwordConfirm" placeholder="passwordConfirm">
-                <span th:if="${#fields.hasErrors('passwordConfirm')}" th:errors="*{passwordConfirm}" style="color:red"></span>
-            </div>
-            <div th:if="${userDto.id != 1}">
-                <label for="roles">Select role: </label>
-                <select th:field="*{roles}" id="roles">
-                    <option th:each="role : ${roles}"
-                            th:value="${role.id}"
-                            th:text="${role.roleName.substring(5).toLowerCase()}"></option>
-                </select>
-            </div>
-            <br>
+            <div th:replace="admin/fragments/user_form :: form"></div>
             <input type="submit" value="Update"/>
         </form>
-
-        <form th:method="post" th:action="@{/admin/delete}" style="display:inline;"
-              onsubmit="return confirm('Are you sure you want to delete this user?')">
-            <input type="hidden" name="id" th:value="${userDto.id}"/>
-            <button type="submit">Delete</button>
-        </form>
-
         <form th:method="get" th:action="@{/admin/admin_page}" style="display:inline;">
             <button type="submit">Return to users list</button>
         </form>

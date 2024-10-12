@@ -5,19 +5,19 @@
     <title>Login page</title>
 </head>
 <body>
-    <h1>Login page</h1>
+    <h1>Please sign in</h1>
     <form th:action="@{/process_login}" th:method="post" style="display:inline;">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
         <div th:if="${param.error}" style="color: red">
             Incorrect email or password!
         </div>
         <div>
-            <label for="email">Enter email: </label>
-            <input type="email" name="username" id="email" placeholder="email"/>
+            <label for="email"></label>
+            <input type="email" name="username" id="email" placeholder="Email address"/>
         </div>
         <div>
-            <label for="password">Enter password: </label>
-            <input type="password" name="password" id="password" placeholder="password"/>
+            <label for="password"></label>
+            <input type="password" name="password" id="password" placeholder="Password"/>
         </div><br>
         <input type="submit" value="Login"/>
     </form>
